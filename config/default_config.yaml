@@ -1,0 +1,169 @@
+# RIGID Gait Recognition - Default Configuration
+# Configuration file for training and inference
+
+# Model Configuration - RIGID Fixed Architecture
+model:
+  convnext_blocks: 3  # Fixed: (1,1,1) depths with (50,100,200) dims
+  dense_dim: 128
+  dropout_rate: 0.25
+  use_pretrained: false
+
+# Data Configuration
+data:
+  frame_size: 66  # RIGID specific input size
+  max_frames_per_video: 30
+  validation_split: 0.2
+  use_preprocessed: true
+  preprocessed_path: "data/processed/dmgait_dataset.npz"
+  dataset_path: "data/raw/"
+  max_videos_per_class: null  # null for no limit
+  
+  # Data augmentation
+  augmentation:
+    enabled: true
+    rotation_range: 15
+    zoom_range: 0.1
+    width_shift_range: 0.1
+    height_shift_range: 0.1
+    horizontal_flip: false
+    fill_mode: "nearest"
+
+# Training Configuration
+training:
+  batch_size: 32
+  epochs: 100
+  learning_rate: 0.001
+  weight_decay: 1e-4
+  early_stopping_patience: 20
+  reduce_lr_patience: 10
+  reduce_lr_factor: 0.5
+  min_learning_rate: 1e-7
+  
+  # Optimizer settings
+  optimizer: "adam"
+  beta_1: 0.9
+  beta_2: 0.999
+  epsilon: 1e-7
+  
+  # Loss function
+  loss_function: "sparse_categorical_crossentropy"
+  
+  # Metrics
+  metrics:
+    - "accuracy"
+    - "sparse_categorical_crossentropy"
+
+# Inference Configuration
+inference:
+  batch_size: 1
+  confidence_threshold: 0.5
+  top_k_predictions: 3
+  
+# Hardware Configuration
+hardware:
+  use_gpu: true
+  gpu_memory_growth: true
+  num_parallel_calls: 4
+  prefetch_buffer_size: 2
+
+# Logging and Monitoring
+logging:
+  log_level: "INFO"
+  save_tensorboard_logs: true
+  save_model_summary: true
+  print_frequency: 10
+  
+# Output Configuration
+output_dir: "outputs/"
+save_predictions: true
+save_visualizations: true
+create_submission_file: false
+
+# Evaluation Configuration
+evaluation:
+  test_batch_size: 64
+  save_confusion_matrix: true
+  save_classification_report: true
+  calculate_per_class_metrics: true
+  
+# Reproducibility
+seed: 42
+deterministic: true
+
+# Paths
+paths:
+  model_checkpoint: "models/checkpoints/"
+  logs: "logs/"
+  plots: "plots/"
+  results: "results/"
+  data_cache: "data/cache/"
+
+# Dataset specific settings - DMGait Dataset
+dataset:
+  # DMGait Dataset (Large Gait Dataset)
+  dmgait:
+    num_classes: 64  # 64 participants
+    video_extension: ".mp4"
+    frame_rate: 30
+    total_walks: 1560  # 24 walks per person
+    total_videos: 3120  # 2 cameras per walk
+    total_frames: 748800  # ~748,800 frames
+    keypoints: 56160000  # ~56.16M keypoints (75 per frame)
+    sensor_samples: 1026480  # ~1.026M goniometer samples
+    duration_minutes: 415  # ~415 minutes total video
+    
+    # Dataset characteristics
+    participants: 64  # 37 male, 27 female
+    age_range: "18-65"  # Average: 35.14 ± 12.44
+    height_avg: "170.83 ± 10.86 cm"
+    weight_avg: "81.51 ± 20.18 kg"
+    ethnicity: "62.5% White European, 37.5% non-European"
+    
+    # Experimental setup
+    views: 8  # 8 angles (0°-315°, every 45°)
+    environments: ["indoor", "outdoor"]
+    clothing_variations: 2  # 2 different clothing sets per person
+    sensor_positions: ["thigh", "upper_arm", "head"]  # 3 sensor positions
+    
+    # Data processing
+    pose_estimation: "OpenPose"
+    keypoints_per_frame: 75
+    sensor_frequency: 84  # Hz
+    gait_cycles: 12480  # Total gait cycles recorded
+    
+    # Citation
+    paper: "Topham, L.K., Khan, W., Al-Jumeily, D. et al. A diverse and multi-modal gait dataset of indoor and outdoor walks acquired using multiple cameras and sensors. Sci Data 10, 320 (2023). https://doi.org/10.1038/s41597-023-02161-8"
+    dataset_url: "https://www.kaggle.com/datasets/salmon1/large-gait-dataset/data"
+    
+# Model variants for ablation studies (from RIGID paper)
+ablation:
+  # ConvNeXt block variations (from paper results)
+  convnext_blocks_options: [1, 3, 6, 10, 15]
+  
+  # Dense layer variations (from paper results)
+  dense_dim_options: [64, 128, 256, 512, 1024]
+  
+  # Dropout variations (from paper results)
+  dropout_options: [0.1, 0.25, 0.4, 0.5]
+  
+  # Feature ablation (from paper results)
+  feature_combinations:
+    - ["coordinate_only"]
+    - ["distance_only"] 
+    - ["grayscale_only"]
+    - ["coordinate", "distance"]
+    - ["coordinate", "grayscale"]
+    - ["distance", "grayscale"]
+    - ["coordinate", "distance", "grayscale"]  # Full RIGID model
+
+# Performance optimization
+optimization:
+  mixed_precision: false
+  gradient_checkpointing: false
+  compile_model: true
+  
+# Security and Privacy
+privacy:
+  anonymize_predictions: false
+  save_intermediate_features: false
+  encrypt_model_weights: false
