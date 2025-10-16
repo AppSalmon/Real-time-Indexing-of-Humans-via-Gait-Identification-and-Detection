@@ -2,25 +2,10 @@
 
 This directory contains datasets and processed data for RIGID gait recognition.
 
-## Directory Structure
-
-```
-data/
-├── raw/                    # Raw video data
-│   ├── dmgait/            # DMGait dataset videos (64 participants)
-│   ├── realworld-v1/      # RealWorld-v1 dataset videos (6 participants)
-│   └── realworld-v2/      # RealWorld-v2 dataset videos (13 participants)
-├── processed/             # Preprocessed data
-│   ├── dmgait_dataset.npz # Processed DMGait features
-│   ├── realworld_v1_dataset.npz # Processed RealWorld-v1 features
-│   └── realworld_v2_dataset.npz # Processed RealWorld-v2 features
-└── cache/                 # Temporary cache files
-```
-
 ## Dataset Information
 
 ### DMGait Dataset (Primary Training Dataset)
-- **Source**: [Kaggle - Large Gait Dataset](https://www.kaggle.com/datasets/salmon1/large-gait-dataset/data)
+- **Source**: https://www.nature.com/articles/s41597-023-02161-8#citeas
 - **Participants**: 64 people (37 male, 27 female, age 18-65)
 - **Total videos**: 3,120 (2 cameras per walk)
 - **Total walks**: 1,560 (24 walks per person)
@@ -35,6 +20,7 @@ data/
 **Citation**: Topham, L.K., Khan, W., Al-Jumeily, D. et al. A diverse and multi-modal gait dataset of indoor and outdoor walks acquired using multiple cameras and sensors. Sci Data 10, 320 (2023). https://doi.org/10.1038/s41597-023-02161-8
 
 ### RealWorld-v1 Dataset (Limited Data Testing)
+- **Source**: [Kaggle - RealWorld Gait Dataset](https://www.kaggle.com/datasets/salmon1/realworld-gait)
 - **Participants**: 6 people (folders: ha, lukas, nguyen, put, tuan, duy)
 - **Recording setup**: Single angle view
 - **Total videos**: ~95 videos (6 participants)
@@ -46,6 +32,7 @@ data/
   - Used for testing model performance with limited training data
 
 ### RealWorld-v2 Dataset (Multi-condition Testing)
+- **Source**: [Kaggle - RealWorld Gait Sequence Dataset](https://www.kaggle.com/datasets/caophankhnhduy/realworldgait)
 - **Participants**: 13 people (RealWorld-v1 + 7 additional participants)
 - **Total videos**: >300 clips
 - **Purpose**: Multi-condition testing to ensure diverse recording conditions
@@ -55,6 +42,31 @@ data/
   - Various environments and scenarios
   - Comprehensive testing dataset
   - Used for evaluating model robustness across different conditions
+
+### RealWorld Dataset Naming Convention
+Each video follows a strict naming pattern: `P{subject}_B{background}_C{clothing}_A{angle}_D{direction}_R{repetition}.mp4`
+
+| Component | Values | Description |
+|-----------|--------|-------------|
+| **P** | `P1` → `P7` | Subject ID (7 participants) |
+| **B** | `B1`, `B2` | Background |
+| | `B1`: Bicycle yard (outdoor, natural light) |
+| | `B2`: Laboratory (indoor, artificial light) |
+| **C** | `N`, `C`, `B` | Clothing |
+| | `N`: None (no coat, no backpack) |
+| | `C`: Coat only |
+| | `B`: Coat & Backpack |
+| **A** | `0`, `90` | View angle |
+| | `0`: Front or rear view |
+| | `90`: Side view (perpendicular to walking direction) |
+| **D** | `L`, `R` | Walking direction |
+| | `L`: Left-to-right |
+| | `R`: Right-to-left |
+| **R** | `1`, `2` | Repetition |
+| | `1`: First recording |
+| | `2`: Repeated recording of the same setup |
+
+**Example**: `P2_B1_B_0_R_2.mp4` = Subject 2, background B1 (bicycle yard), wearing coat & backpack, 0° camera view, walking right-to-left, repetition 2.
 
 ## Dataset Usage
 
@@ -79,12 +91,6 @@ data/
    - Grayscale frames (D): Original video frames
 4. **Feature Stacking**: Combine into (66, 66, 3) tensor
 5. **Data Saving**: Store as compressed .npz files
-
-### Usage Instructions
-1. Download datasets from provided links
-2. Place raw videos in appropriate subdirectories under `raw/`
-3. Run preprocessing scripts to generate `.npz` files in `processed/`
-4. Use processed data for training and evaluation
 
 ## File Formats
 
